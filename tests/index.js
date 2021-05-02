@@ -10,15 +10,16 @@ for(let j = 0; j < count; j++) {
 	pixels[j] = (Math.random() * 0xff);
 }
 
+let time;
 //console.log('source', pixels);
-
-let time = Date.now();
-transformWasm(pixels, 0, 1, 2, 1, 10, 0, -1, 0);//125 127 128
-console.log('wasm', Date.now() - time);
 
 time = Date.now();
 transformJS(pixels, 0, 1, 2, 1, 10, 0, -1, 0);// 20
 console.log('js', Date.now() - time);
+
+time = Date.now();
+transformWasm(pixels, 0, 1, 2, 1, 10, 0, -1, 0);//125 127 128
+console.log('wasm', Date.now() - time);
 
 //console.log('result', pixels);
 
