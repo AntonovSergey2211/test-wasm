@@ -3,24 +3,51 @@ const myModule = require("..");
 
 const memoryArray = new Uint8Array(myModule.memory.buffer);
 
-const pixels = Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8]);
-console.log('source', pixels);
+let count = 2880 * 1800 * 4;
+const pixels = new Uint8Array(count);
 
-const length = pixels.length;
-
-for (let i = 0; i < length; i++) {
-	memoryArray[i] = pixels[i];
+for(let j = 0; j < count; j++) {
+	pixels[j] = (Math.random() * 0xff);
 }
 
-myModule.transform(length, 0, 1, 2, 1, 10, 0, -1, 0);
+//console.log('source', pixels);
 
-for (let i = 0; i < length; i++) {
-	pixels[i] = memoryArray[i];
-}
+let time = Date.now();
+transformWasm(pixels, 0, 1, 2, 1, 10, 0, -1, 0);//125 127 128
+console.log('wasm', Date.now() - time);
 
-console.log('result', pixels);
-console.log('memoryArray.length', memoryArray.length);
-console.log('memory.length', myModule.memory.buffer.byteLength);
-myModule.memory.grow(1);
-console.log('memory.length', myModule.memory.buffer.byteLength);
+time = Date.now();
+transformJS(pixels, 0, 1, 2, 1, 10, 0, -1, 0);// 20
+console.log('js', Date.now() - time);
+
+//console.log('result', pixels);
+
+// console.log('memoryArray.length', memoryArray.length);
+// console.log('memory.length', myModule.memory.buffer.byteLength);
+// myModule.memory.grow(1);
+// console.log('memory.length', myModule.memory.buffer.byteLength);
 console.log("ok");
+
+function transformWasm(pixels, rm, gm, bm, am, ro, go, bo, ao) {
+	const length = pixels.length;
+
+	for (let i = 0; i < length; i++) {
+		memoryArray[i] = pixels[i];
+	}
+
+	myModule.transform(length, rm, gm, bm, am, ro, go, bo, ao);
+	
+	for (let i = 0; i < length; i++) {
+		pixels[i] = memoryArray[i];
+	}
+}
+
+function transformJS(pixels, rm, gm, bm, am, ro, go, bo, ao) {
+	const length = pixels.length;
+	for (let i = 0; i < length; i += 4) {
+		pixels[i] = pixels[i++] * rm + ro;
+		pixels[i] = pixels[i++] * gm + go;
+		pixels[i] = pixels[i++] * bm + bo;
+		pixels[i] = pixels[i]   * am + ao;
+	}
+}
