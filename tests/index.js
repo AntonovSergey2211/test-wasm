@@ -6,7 +6,7 @@ const memoryArray = new Uint8Array(myModule.memory.buffer);
 let count = 2880 * 1800 * 4;
 const pixels = new Uint8Array(count);
 
-for(let j = 0; j < count; j++) {
+for (let j = 0; j < count; j++) {
 	pixels[j] = (Math.random() * 0xff);
 }
 
@@ -21,7 +21,11 @@ time = Date.now();
 transformWasm(pixels, 0, 1, 2, 1, 10, 0, -1, 0);//125 127 128
 console.log('wasm', Date.now() - time);
 
-//console.log('result', pixels);
+let summ = 0;
+for (let i = 0; i < pixels.length; i++) {
+	summ += pixels[i];
+}
+console.log('summ', summ);
 
 // console.log('memoryArray.length', memoryArray.length);
 // console.log('memory.length', myModule.memory.buffer.byteLength);
@@ -37,7 +41,7 @@ function transformWasm(pixels, rm, gm, bm, am, ro, go, bo, ao) {
 	}
 
 	myModule.transform(length, rm, gm, bm, am, ro, go, bo, ao);
-	
+
 	for (let i = 0; i < length; i++) {
 		pixels[i] = memoryArray[i];
 	}
@@ -49,6 +53,6 @@ function transformJS(pixels, rm, gm, bm, am, ro, go, bo, ao) {
 		pixels[i] = pixels[i++] * rm + ro;
 		pixels[i] = pixels[i++] * gm + go;
 		pixels[i] = pixels[i++] * bm + bo;
-		pixels[i] = pixels[i]   * am + ao;
+		pixels[i] = pixels[i] * am + ao;
 	}
 }
