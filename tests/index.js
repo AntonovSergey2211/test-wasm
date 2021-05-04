@@ -10,27 +10,37 @@ for (let j = 0; j < count; j++) {
 	pixels[j] = (Math.random() * 0xff);
 }
 
+const pixelsJS = pixels.slice(0, count);
+const pixelsWasm = pixels.slice(0, count);
+
+const rm = 0;
+const gm = 1;
+const bm = 1;
+const am = 1;
+const ro = 128;
+const go = -64;
+const bo = 0;
+const ao = 0;
+
 let time;
-//console.log('source', pixels);
 
 time = Date.now();
-transformJS(pixels, 0, 1, 2, 1, 10, 0, -1, 0);// 20
+transformJS(pixelsJS, rm, gm, bm, am, ro, go, bo, ao);
 console.log('js', Date.now() - time);
 
 time = Date.now();
-transformWasm(pixels, 0, 1, 2, 1, 10, 0, -1, 0);//125 127 128
+transformWasm(pixelsWasm, rm, gm, bm, am, ro, go, bo, ao);
 console.log('wasm', Date.now() - time);
 
-let summ = 0;
-for (let i = 0; i < pixels.length; i++) {
-	summ += pixels[i];
-}
-console.log('summ', summ);
+for (let i = 0; i < count; i++) {
+	try {
+		assert(pixelsJS[i] === pixelsWasm[i], 'Incorrect result');
+	} catch (e) {
+		throw `Incorrect values: index: ${i}, source: ${pixels[i]}, JS: ${pixelsJS[i]} ', WASM: ' ${pixelsWasm[i]}`;
 
-// console.log('memoryArray.length', memoryArray.length);
-// console.log('memory.length', myModule.memory.buffer.byteLength);
-// myModule.memory.grow(1);
-// console.log('memory.length', myModule.memory.buffer.byteLength);
+	}
+}
+
 console.log("ok");
 
 function transformWasm(pixels, rm, gm, bm, am, ro, go, bo, ao) {
