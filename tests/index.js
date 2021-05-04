@@ -15,7 +15,7 @@ const pixelsWasm = pixels.slice(0, count);
 
 const rm = 0;
 const gm = 1;
-const bm = 1;
+const bm = 0.5;
 const am = 1;
 const ro = 128;
 const go = -64;
@@ -34,10 +34,10 @@ console.log('wasm', Date.now() - time);
 
 for (let i = 0; i < count; i++) {
 	try {
+		//console.log(i, pixelsJS[i], pixelsWasm[i]);
 		assert(pixelsJS[i] === pixelsWasm[i], 'Incorrect result');
 	} catch (e) {
 		throw `Incorrect values: index: ${i}, source: ${pixels[i]}, JS: ${pixelsJS[i]} ', WASM: ' ${pixelsWasm[i]}`;
-
 	}
 }
 
